@@ -7,7 +7,7 @@ Makes timestamps human-readable
 Download & installation
 -----------------------
 
-Download the workflow from [GitHub][gh-releases], then double-click to install.
+Download the workflow file from [GitHub](https://github.com/snooze92/alfred-epoch-converter/releases/latest), then double-click to install.
 
 
 Usage

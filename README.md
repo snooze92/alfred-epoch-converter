@@ -3,6 +3,8 @@ Alfred epoch converter
 
 Makes timestamps human-readable
 
+![gif](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/alfred-epoch-converter.gif)
+
 
 Download & installation
 -----------------------
@@ -18,3 +20,4 @@ Usage
 - `ts <timestamp>` will guess the precision and display as human readable, both Local and GMT
 
 Pressing `enter` after selecting any option will copy the value in the clipboard.
+![notif](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/alfred-epoch-converter.png)

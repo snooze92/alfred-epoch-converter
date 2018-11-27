@@ -37,7 +37,7 @@ def add_conversion(wf, timestamp, descriptor, converter):
 
 
 def add_current(wf, unit, multiplier):
-    converted = str(int(time.time() * multiplier)).rstrip('0').rstrip('.')
+    converted = str(int(time.time() * multiplier))
     description = 'Current timestamp ({unit})'.format(**locals())
     LOGGER.debug('Returning [{converted}] as [{description}]'.format(**locals()))
     wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_NOTE)

@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import datetime
+import subprocess
 import sys
 import time
 from workflow import Workflow, ICON_CLOCK, ICON_NOTE
@@ -43,6 +44,12 @@ def add_current(wf, unit, multiplier):
     wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_NOTE)
 
 
+def get_clipboard_data():
+    p = subprocess.Popen(['pbpaste'], stdout=subprocess.PIPE)
+    exit_code = p.wait()
+    return p.stdout.read()
+
+
 def main(wf):
     if len(wf.args) > 0:
         query = wf.args[0]
@@ -51,6 +58,16 @@ def main(wf):
             timestamp = float(query)
             add_conversion(wf, timestamp, 'Local', datetime.datetime.fromtimestamp)
             add_conversion(wf, timestamp, 'UTC', datetime.datetime.utcfromtimestamp)
+
+    clipboard = get_clipboard_data()
+    if clipboard:
+        LOGGER.debug('Got clipboard [{clipboard}]'.format(**locals()))
+        try:
+            timestamp = float(clipboard)
+            add_conversion(wf, timestamp, '(clipboard) Local', datetime.datetime.fromtimestamp)
+            add_conversion(wf, timestamp, '(clipboard) UTC', datetime.datetime.utcfromtimestamp)
+        except:
+            LOGGER.debug('Unable to convert clipboard [{clipboard}]')
 
     add_current(wf, 's', 1)
     add_current(wf, 'ms', 1e3)

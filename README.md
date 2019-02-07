@@ -44,4 +44,5 @@ Usage
 - `ts <timestamp>` will guess the precision and display as human readable, both Local and GMT
 - `ts <YYYY-mm-dd>` will give epoch timestamps on that date, at midnight
 - `ts <YYYY-mm-dd> <HH:MM:SS>` will give epoch timestamps on that date, at that time (both space and T are supported as separator, seconds are optional)
+- `ts <HH:MM:SS>` will give epoch timestamps for today, at that time (seconds are optional)
 - `ts` will display the current time as a UNIX epoch timestamp with different precisions, as well as attempt converting what is in your clipboard

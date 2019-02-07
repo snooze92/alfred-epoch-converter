@@ -1,9 +1,34 @@
+![icon](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/icon.png)
+
 Alfred epoch converter
 ======================
 
-Makes timestamps human-readable
+Makes it easy to work with epoch timestamps!
 
-![gif](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/alfred-epoch-converter.gif)
+Convert epoch timestamp to human-readable time
+----------------------------------------------
+
+You can easily type an epoch timestamp with any precision and convert it into a human readable string:
+![convert-epoch](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-epoch.gif)
+
+Select the option you want, press enter, and the value is copied into your clipboard:
+![convert-epoch-notification](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-epoch-notification.gif)
+
+If you have an epoch timestamp in your clipboard, no need to type or paste it. The workflow will recognize it for you:
+![convert-clipboard-epoch](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-clipboard-epoch.gif)
+
+
+Convert human-readable time to epoch timestamp
+----------------------------------------------
+
+You can easily type a human-readable time and convert it into an epoch timestamp with any precision:
+![convert-time](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-time.gif)
+
+Select the option you want, press enter, and the value is copied into your clipboard:
+![convert-time-notification](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-time-notification.gif)
+
+If you have a human-readable time in your clipboard, no need to type or paste it. The workflow will recognize it for you:
+![convert-clipboard-time](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/imgs/convert-clipboard-time.gif)
 
 
 Download & installation
@@ -16,8 +41,7 @@ The workflow is also released on [Packal](http://www.packal.org/workflow/epoch-c
 Usage
 -----
 
-- `ts` will display the current time as a UNIX epoch timestamp with different precisions
 - `ts <timestamp>` will guess the precision and display as human readable, both Local and GMT
-
-Pressing `enter` after selecting any option will copy the value in the clipboard.
-![notif](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/alfred-epoch-converter.png)
+- `ts <YYYY-mm-dd>` will give epoch timestamps on that date, at midnight
+- `ts <YYYY-mm-dd> <HH:MM:SS>` will give epoch timestamps on that date, at that time (both space and T are supported as separator, seconds are optional)
+- `ts` will display the current time as a UNIX epoch timestamp with different precisions, as well as attempt converting what is in your clipboard

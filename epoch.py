@@ -30,7 +30,7 @@ def convert(timestamp, converter):
 
 def add_epoch_to_time_conversion(wf, timestamp, descriptor, converter):
     converted = convert(timestamp, converter)
-    description = descriptor + ' time for ' + str(timestamp)
+    description = descriptor + ' time for ' + '{0:.99f}'.format(timestamp).rstrip('0').rstrip('.')
     if converted is None:
         raise Exception('Timestamp [{timestamp}] is not supported'.format(**locals()))
     else:

@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 import datetime
+import re
 import subprocess
 import sys
 import time
@@ -27,7 +28,7 @@ def convert(timestamp, converter):
         return '.'.join([converter(seconds).isoformat(), str(subseconds).rstrip('0').rstrip('.')]).rstrip('0').rstrip('.')
 
 
-def add_conversion(wf, timestamp, descriptor, converter):
+def add_epoch_to_time_conversion(wf, timestamp, descriptor, converter):
     converted = convert(timestamp, converter)
     description = descriptor + ' time for ' + str(timestamp)
     if converted is None:
@@ -35,6 +36,38 @@ def add_conversion(wf, timestamp, descriptor, converter):
     else:
         LOGGER.debug('Returning [{converted}] as [{description}] for [{timestamp}]'.format(**locals()))
         wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
+
+
+def add_time_to_epoch_conversion(wf, dt, descriptor, converter, multiplier):
+    converted = str(int((dt - converter(0)).total_seconds() * multiplier))
+    description = descriptor + ' epoch for ' + str(dt)
+    wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
+
+def attempt_conversions(wf, input, prefix=''):
+    try:
+        timestamp = float(input)
+        add_epoch_to_time_conversion(wf, timestamp, '{prefix}Local'.format(**locals()), datetime.datetime.fromtimestamp)
+        add_epoch_to_time_conversion(wf, timestamp, '{prefix}UTC'.format(**locals()), datetime.datetime.utcfromtimestamp)
+    except:
+        LOGGER.debug('Unable to read [{input}] as an epoch timestamp'.format(**locals()))
+
+    try:
+        match = re.match('(\d{4}-\d{2}-\d{2})?[ T]?((\d{2}:\d{2})(:\d{2})?)?', str(input))
+        date, time, hour_minutes, seconds = match.groups()
+        if date or time:
+            dt = datetime.datetime.strptime((date or datetime.datetime.now().strftime('%Y-%m-%d')) + ' ' + (hour_minutes or '00:00') + (seconds or ':00'), '%Y-%m-%d %H:%M:%S')
+
+            add_time_to_epoch_conversion(wf, dt, '{prefix}Local s.'.format(**locals()), datetime.datetime.fromtimestamp, 1)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}Local ms.'.format(**locals()), datetime.datetime.fromtimestamp, 1e3)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}Local us.'.format(**locals()), datetime.datetime.fromtimestamp, 1e6)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}Local ns.'.format(**locals()), datetime.datetime.fromtimestamp, 1e9)
+
+            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC s.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ms.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e3)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC us.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e6)
+            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ns.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e9)
+    except:
+        LOGGER.debug('Unable to read [{input}] as a human-readable datetime'.format(**locals()))
 
 
 def add_current(wf, unit, multiplier):
@@ -55,19 +88,12 @@ def main(wf):
         query = wf.args[0]
         if query:
             LOGGER.debug('Got query [{query}]'.format(**locals()))
-            timestamp = float(query)
-            add_conversion(wf, timestamp, 'Local', datetime.datetime.fromtimestamp)
-            add_conversion(wf, timestamp, 'UTC', datetime.datetime.utcfromtimestamp)
+            attempt_conversions(wf, query)
 
     clipboard = get_clipboard_data()
     if clipboard:
         LOGGER.debug('Got clipboard [{clipboard}]'.format(**locals()))
-        try:
-            timestamp = float(clipboard)
-            add_conversion(wf, timestamp, '(clipboard) Local', datetime.datetime.fromtimestamp)
-            add_conversion(wf, timestamp, '(clipboard) UTC', datetime.datetime.utcfromtimestamp)
-        except:
-            LOGGER.debug('Unable to convert clipboard [{clipboard}]')
+        attempt_conversions(wf, clipboard, prefix='(clipboard) ')
 
     add_current(wf, 's', 1)
     add_current(wf, 'ms', 1e3)

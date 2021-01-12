@@ -16,7 +16,7 @@ def get_divisor(timestamp):
     for power in range(MAX_SUBSECONDS_ITERATION):
         divisor = pow(1e3, power)
         if timestamp < MAX_SECONDS_TIMESTAMP * divisor:
-            return divisor
+            return int(divisor)
     return 0
 
 
@@ -25,12 +25,13 @@ def convert(timestamp, converter):
     LOGGER.debug('Found divisor [{divisor}] for timestamp [{timestamp}]'.format(**locals()))
     if divisor > 0:
         seconds, subseconds = divmod(timestamp, divisor)
-        return '.'.join([converter(seconds).isoformat(), str(subseconds).rstrip('0').rstrip('.')]).rstrip('0').rstrip('.')
+        subseconds_str = '{:.9f}'.format(subseconds / float(divisor))
+        return converter(seconds).isoformat() + subseconds_str[1:].rstrip('0').rstrip('.')
 
 
 def add_epoch_to_time_conversion(wf, timestamp, descriptor, converter):
     converted = convert(timestamp, converter)
-    description = descriptor + ' time for ' + '{0:.99f}'.format(timestamp).rstrip('0').rstrip('.')
+    description = descriptor + ' time for ' + str(timestamp)
     if converted is None:
         raise Exception('Timestamp [{timestamp}] is not supported'.format(**locals()))
     else:
@@ -45,7 +46,7 @@ def add_time_to_epoch_conversion(wf, dt, descriptor, converter, multiplier):
 
 def attempt_conversions(wf, input, prefix=''):
     try:
-        timestamp = float(input)
+        timestamp = int(input)
         add_epoch_to_time_conversion(wf, timestamp, '{prefix}Local'.format(**locals()), datetime.datetime.fromtimestamp)
         add_epoch_to_time_conversion(wf, timestamp, '{prefix}UTC'.format(**locals()), datetime.datetime.utcfromtimestamp)
     except:

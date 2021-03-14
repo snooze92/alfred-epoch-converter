@@ -56,7 +56,12 @@ def attempt_conversions(wf, input, prefix=''):
         match = re.match('(\d{4}-\d{2}-\d{2})?[ T]?((\d{2}:\d{2})(:\d{2})?(.\d+)?)?', str(input))
         date, time, hour_minutes, seconds, subseconds = match.groups()
         if date or time:
-            dt = datetime.datetime.strptime((date or datetime.datetime.now().strftime('%Y-%m-%d')) + ' ' + (hour_minutes or '00:00') + (seconds or ':00') + (subseconds[:7] or '.000000'), '%Y-%m-%d %H:%M:%S.%f')
+            dt = datetime.datetime.strptime(
+                (date or datetime.datetime.now().strftime('%Y-%m-%d')) + ' ' +
+                (hour_minutes or '00:00') + (seconds or ':00') +
+                ('.000000' if subseconds is None else subseconds[:7]),
+                '%Y-%m-%d %H:%M:%S.%f'
+            )
 
             add_time_to_epoch_conversion(wf, dt, '{prefix}Local s.'.format(**locals()), datetime.datetime.fromtimestamp, 1)
             add_time_to_epoch_conversion(wf, dt, '{prefix}Local ms.'.format(**locals()), datetime.datetime.fromtimestamp, 1e3)

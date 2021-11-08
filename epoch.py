@@ -65,12 +65,12 @@ def attempt_conversions(wf, input, prefix=''):
 
             add_time_to_epoch_conversion(wf, dt, '{prefix}Local s.'.format(**locals()), datetime.datetime.fromtimestamp, 1)
             add_time_to_epoch_conversion(wf, dt, '{prefix}Local ms.'.format(**locals()), datetime.datetime.fromtimestamp, 1e3)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}Local us.'.format(**locals()), datetime.datetime.fromtimestamp, 1e6)
+            add_time_to_epoch_conversion(wf, dt, u'{prefix}Local µs.'.format(**locals()), datetime.datetime.fromtimestamp, 1e6)
             add_time_to_epoch_conversion(wf, dt, '{prefix}Local ns.'.format(**locals()), datetime.datetime.fromtimestamp, 1e9)
 
             add_time_to_epoch_conversion(wf, dt, '{prefix}UTC s.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1)
             add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ms.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e3)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC us.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e6)
+            add_time_to_epoch_conversion(wf, dt, u'{prefix}UTC µs.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e6)
             add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ns.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e9)
     except:
         LOGGER.debug('Unable to read [{input}] as a human-readable datetime'.format(**locals()))
@@ -103,7 +103,7 @@ def main(wf):
 
     add_current(wf, 's', 1)
     add_current(wf, 'ms', 1e3)
-    add_current(wf, 'us', 1e6)
+    add_current(wf, u'µs', 1e6)
     add_current(wf, 'ns', 1e9)
 
     wf.send_feedback()

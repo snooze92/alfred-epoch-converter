@@ -7,6 +7,9 @@ import sys
 import time
 from workflow import Workflow, ICON_CLOCK, ICON_NOTE
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 LOGGER = None # Set in the main...
 MAX_SECONDS_TIMESTAMP = 10000000000
 MAX_SUBSECONDS_ITERATION = 4

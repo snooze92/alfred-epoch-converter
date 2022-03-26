@@ -4,13 +4,14 @@ import datetime
 import re
 import subprocess
 import sys
-import time
+import time as timeutil
+from importlib import reload
+
 from workflow import Workflow, ICON_CLOCK, ICON_NOTE
 
 reload(sys)
-sys.setdefaultencoding('utf-8')
 
-LOGGER = None # Set in the main...
+LOGGER = None  # Set in the main...
 MAX_SECONDS_TIMESTAMP = 10000000000
 MAX_SUBSECONDS_ITERATION = 4
 
@@ -32,26 +33,29 @@ def convert(timestamp, converter):
         return converter(seconds).isoformat() + subseconds_str[1:].rstrip('0').rstrip('.')
 
 
-def add_epoch_to_time_conversion(wf, timestamp, descriptor, converter):
+def add_epoch_to_time_conversion(workflow, timestamp, descriptor, converter):
     converted = convert(timestamp, converter)
     description = descriptor + ' time for ' + str(timestamp)
     if converted is None:
         raise Exception('Timestamp [{timestamp}] is not supported'.format(**locals()))
     else:
         LOGGER.debug('Returning [{converted}] as [{description}] for [{timestamp}]'.format(**locals()))
-        wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
+        workflow.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
 
 
-def add_time_to_epoch_conversion(wf, dt, descriptor, converter, multiplier):
+def add_time_to_epoch_conversion(workflow, dt, descriptor, converter, multiplier):
     converted = str(int((dt - converter(0)).total_seconds() * multiplier))
     description = descriptor + ' epoch for ' + str(dt)
-    wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
+    workflow.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
 
-def attempt_conversions(wf, input, prefix=''):
+
+def attempt_conversions(workflow, input, prefix=''):
     try:
         timestamp = int(input)
-        add_epoch_to_time_conversion(wf, timestamp, '{prefix}Local'.format(**locals()), datetime.datetime.fromtimestamp)
-        add_epoch_to_time_conversion(wf, timestamp, '{prefix}UTC'.format(**locals()), datetime.datetime.utcfromtimestamp)
+        add_epoch_to_time_conversion(workflow, timestamp, '{prefix}Local'.format(**locals()),
+                                     datetime.datetime.fromtimestamp)
+        add_epoch_to_time_conversion(workflow, timestamp, '{prefix}UTC'.format(**locals()),
+                                     datetime.datetime.utcfromtimestamp)
     except:
         LOGGER.debug('Unable to read [{input}] as an epoch timestamp'.format(**locals()))
 
@@ -66,50 +70,58 @@ def attempt_conversions(wf, input, prefix=''):
                 '%Y-%m-%d %H:%M:%S.%f'
             )
 
-            add_time_to_epoch_conversion(wf, dt, '{prefix}Local s.'.format(**locals()), datetime.datetime.fromtimestamp, 1)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}Local ms.'.format(**locals()), datetime.datetime.fromtimestamp, 1e3)
-            add_time_to_epoch_conversion(wf, dt, u'{prefix}Local µs.'.format(**locals()), datetime.datetime.fromtimestamp, 1e6)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}Local ns.'.format(**locals()), datetime.datetime.fromtimestamp, 1e9)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}Local s.'.format(**locals()),
+                                         datetime.datetime.fromtimestamp, 1)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}Local ms.'.format(**locals()),
+                                         datetime.datetime.fromtimestamp, 1e3)
+            add_time_to_epoch_conversion(workflow, dt, u'{prefix}Local µs.'.format(**locals()),
+                                         datetime.datetime.fromtimestamp, 1e6)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}Local ns.'.format(**locals()),
+                                         datetime.datetime.fromtimestamp, 1e9)
 
-            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC s.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ms.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e3)
-            add_time_to_epoch_conversion(wf, dt, u'{prefix}UTC µs.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e6)
-            add_time_to_epoch_conversion(wf, dt, '{prefix}UTC ns.'.format(**locals()), datetime.datetime.utcfromtimestamp, 1e9)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}UTC s.'.format(**locals()),
+                                         datetime.datetime.utcfromtimestamp, 1)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}UTC ms.'.format(**locals()),
+                                         datetime.datetime.utcfromtimestamp, 1e3)
+            add_time_to_epoch_conversion(workflow, dt, u'{prefix}UTC µs.'.format(**locals()),
+                                         datetime.datetime.utcfromtimestamp, 1e6)
+            add_time_to_epoch_conversion(workflow, dt, '{prefix}UTC ns.'.format(**locals()),
+                                         datetime.datetime.utcfromtimestamp, 1e9)
     except:
         LOGGER.debug('Unable to read [{input}] as a human-readable datetime'.format(**locals()))
 
 
-def add_current(wf, unit, multiplier):
-    converted = str(int(time.time() * multiplier))
+def add_current(workflow, unit, multiplier):
+    converted = str(int(timeutil.time() * multiplier))
     description = 'Current timestamp ({unit})'.format(**locals())
     LOGGER.debug('Returning [{converted}] as [{description}]'.format(**locals()))
-    wf.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_NOTE)
+    workflow.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_NOTE)
 
 
 def get_clipboard_data():
     p = subprocess.Popen(['pbpaste'], stdout=subprocess.PIPE)
-    exit_code = p.wait()
+    p.wait()
     return p.stdout.read()
 
 
-def main(wf):
-    if len(wf.args) > 0:
-        query = wf.args[0]
+def main(_workflow_):
+    if len(_workflow_.args) > 0:
+        query = _workflow_.args[0]
         if query:
             LOGGER.debug('Got query [{query}]'.format(**locals()))
-            attempt_conversions(wf, query)
+            attempt_conversions(_workflow_, query)
 
     clipboard = get_clipboard_data()
     if clipboard:
         LOGGER.debug('Got clipboard [{clipboard}]'.format(**locals()))
-        attempt_conversions(wf, clipboard, prefix='(clipboard) ')
+        attempt_conversions(_workflow_, clipboard, prefix='(clipboard) ')
 
-    add_current(wf, 's', 1)
-    add_current(wf, 'ms', 1e3)
-    add_current(wf, u'µs', 1e6)
-    add_current(wf, 'ns', 1e9)
+    add_current(_workflow_, 's', 1)
+    add_current(_workflow_, 'ms', 1e3)
+    add_current(_workflow_, u'µs', 1e6)
+    add_current(_workflow_, 'ns', 1e9)
 
-    wf.send_feedback()
+    _workflow_.send_feedback()
 
 
 if __name__ == u"__main__":

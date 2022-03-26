@@ -18,9 +18,8 @@ import re
 import socket
 import string
 import unicodedata
-import urllib
-import urllib2
-import urlparse
+import urllib.request
+import urllib.parse
 import zlib
 
 
@@ -96,7 +95,7 @@ def str_dict(dic):
     return dic2
 
 
-class NoRedirectHandler(urllib2.HTTPRedirectHandler):
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     """Prevent redirections."""
 
     def redirect_request(self, *args):
@@ -211,8 +210,8 @@ class Response(object):
 
         # Execute query
         try:
-            self.raw = urllib2.urlopen(request)
-        except urllib2.HTTPError as err:
+            self.raw = urllib.request.urlopen(request)
+        except urllib.request.HTTPError as err:
             self.error = err
             try:
                 self.url = err.geturl()
@@ -511,14 +510,14 @@ def request(method, url, params=None, data=None, headers=None, cookies=None,
 
     if auth is not None:  # Add authorisation handler
         username, password = auth
-        password_manager = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        password_manager = urllib.request.HTTPPasswordMgrWithDefaultRealm()
         password_manager.add_password(None, url, username, password)
-        auth_manager = urllib2.HTTPBasicAuthHandler(password_manager)
+        auth_manager = urllib.request.HTTPBasicAuthHandler(password_manager)
         openers.append(auth_manager)
 
     # Install our custom chain of openers
-    opener = urllib2.build_opener(*openers)
-    urllib2.install_opener(opener)
+    opener = urllib.request.build_opener(*openers)
+    urllib.request.install_opener(opener)
 
     if not headers:
         headers = CaseInsensitiveDictionary()
@@ -546,7 +545,7 @@ def request(method, url, params=None, data=None, headers=None, cookies=None,
         new_headers, data = encode_multipart_formdata(data, files)
         headers.update(new_headers)
     elif data and isinstance(data, dict):
-        data = urllib.urlencode(str_dict(data))
+        data = urllib.parse.urlencode(str_dict(data))
 
     # Make sure everything is encoded text
     headers = str_dict(headers)
@@ -556,18 +555,18 @@ def request(method, url, params=None, data=None, headers=None, cookies=None,
 
     if params:  # GET args (POST args are handled in encode_multipart_formdata)
 
-        scheme, netloc, path, query, fragment = urlparse.urlsplit(url)
+        scheme, netloc, path, query, fragment = urllib.parse.urlsplit(url)
 
         if query:  # Combine query string and `params`
-            url_params = urlparse.parse_qs(query)
+            url_params = urllib.parse.parse_qs(query)
             # `params` take precedence over URL query string
             url_params.update(params)
             params = url_params
 
-        query = urllib.urlencode(str_dict(params), doseq=True)
-        url = urlparse.urlunsplit((scheme, netloc, path, query, fragment))
+        query = urllib.parse.urlencode(str_dict(params), doseq=True)
+        url = urllib.parse.urlunsplit((scheme, netloc, path, query, fragment))
 
-    req = urllib2.Request(url, data, headers)
+    req = urllib.request.Request(url, data, headers)
     return Response(req, stream)
 
 

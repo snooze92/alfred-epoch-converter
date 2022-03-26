@@ -22,8 +22,6 @@ up your Python script to best utilise the :class:`Workflow` object.
 from __future__ import print_function, unicode_literals
 
 import binascii
-import cPickle
-from copy import deepcopy
 import json
 import logging
 import logging.handlers
@@ -37,6 +35,7 @@ import subprocess
 import sys
 import time
 import unicodedata
+from copy import deepcopy
 
 try:
     import xml.etree.cElementTree as ET
@@ -44,7 +43,7 @@ except ImportError:  # pragma: no cover
     import xml.etree.ElementTree as ET
 
 from util import (
-    AcquisitionError,  # imported to maintain API
+    # imported to maintain API
     atomic_writer,
     LockFile,
     uninterruptible,
@@ -402,7 +401,6 @@ DUMB_PUNCTUATION = {
     '—': '-'
 }
 
-
 ####################################################################
 # Used by `Workflow.filter`
 ####################################################################
@@ -434,7 +432,6 @@ MATCH_SUBSTRING = 32
 MATCH_ALLCHARS = 64
 #: Combination of all other ``MATCH_*`` constants
 MATCH_ALL = 127
-
 
 ####################################################################
 # Used by `Workflow.check_update`
@@ -568,7 +565,7 @@ class SerializerManager(object):
         """
         if name not in self._serializers:
             raise ValueError('No such serializer registered : {0}'.format(
-                             name))
+                name))
 
         serializer = self._serializers[name]
         del self._serializers[name]
@@ -643,7 +640,7 @@ class CPickleSerializer(object):
         :rtype: object
 
         """
-        return cPickle.load(file_obj)
+        return pickle.load(file_obj)
 
     @classmethod
     def dump(cls, obj, file_obj):
@@ -657,7 +654,7 @@ class CPickleSerializer(object):
         :type file_obj: ``file`` object
 
         """
-        return cPickle.dump(obj, file_obj, protocol=-1)
+        return pickle.dump(obj, file_obj, protocol=-1)
 
 
 class PickleSerializer(object):
@@ -1099,7 +1096,7 @@ class Workflow(object):
             if self.alfred_env.get('workflow_bundleid'):
                 self._bundleid = self.alfred_env.get('workflow_bundleid')
             else:
-                self._bundleid = unicode(self.info['bundleid'], 'utf-8')
+                self._bundleid = self.info['bundleid']
 
         return self._bundleid
 
@@ -1167,8 +1164,8 @@ class Workflow(object):
                 filepath = self.workflowfile('version')
 
                 if os.path.exists(filepath):
-                    with open(filepath, 'rb') as fileobj:
-                        version = fileobj.read()
+                    with open(filepath, 'r') as f:
+                        version = f.read()
 
             # info.plist
             if not version:
@@ -1293,7 +1290,7 @@ class Workflow(object):
             # the library is in. CWD will be the workflow root if
             # a workflow is being run in Alfred
             candidates = [
-                os.path.abspath(os.getcwdu()),
+                os.path.abspath(os.getcwd()),
                 os.path.dirname(os.path.abspath(os.path.dirname(__file__)))]
 
             # climb the directory tree until we find `info.plist`
@@ -1613,6 +1610,7 @@ class Workflow(object):
         :returns: data in datastore or ``None``
 
         """
+
         # Ensure deletion is not interrupted by SIGTERM
         @uninterruptible
         def delete_paths(paths):
@@ -1684,7 +1682,6 @@ class Workflow(object):
         age = self.cached_data_age(name)
 
         if (age < max_age or max_age == 0) and os.path.exists(cache_path):
-
             with open(cache_path, 'rb') as file_obj:
                 self.logger.debug('loading cached data: %s', cache_path)
                 return serializer.load(file_obj)
@@ -1932,7 +1929,6 @@ class Workflow(object):
         # pre-filter any items that do not contain all characters
         # of ``query`` to save on running several more expensive tests
         if not set(query) <= set(value.lower()):
-
             return (0, None)
 
         # item starts with query
@@ -1982,7 +1978,7 @@ class Workflow(object):
         # `query` is a substring of initials, e.g. ``doh`` matches
         # "The Dukes of Hazzard"
         elif (match_on & MATCH_INITIALS_CONTAIN and
-                query in initials):
+              query in initials):
             score = 95.0 - (len(initials) / len(query))
 
             return (score, MATCH_INITIALS_CONTAIN)
@@ -2077,7 +2073,7 @@ class Workflow(object):
 
             if not sys.stdout.isatty():  # Show error in Alfred
                 if text_errors:
-                    print(unicode(err).encode('utf-8'), end='')
+                    print(err, end='')
                 else:
                     self._items = []
                     if self._name:
@@ -2086,9 +2082,7 @@ class Workflow(object):
                         name = self._bundleid
                     else:  # pragma: no cover
                         name = os.path.dirname(__file__)
-                    self.add_item("Error in workflow '%s'" % name,
-                                  unicode(err),
-                                  icon=ICON_ERROR)
+                    self.add_item("Error in workflow '%s'" % name, str(err), icon=ICON_ERROR)
                     self.send_feedback()
             return 1
 
@@ -2173,7 +2167,7 @@ class Workflow(object):
         for item in self._items:
             root.append(item.elem)
         sys.stdout.write('<?xml version="1.0" encoding="utf-8"?>\n')
-        sys.stdout.write(ET.tostring(root).encode('utf-8'))
+        sys.stdout.write(ET.tostring(root).decode('utf-8'))
         sys.stdout.flush()
 
     ####################################################################
@@ -2239,7 +2233,7 @@ class Workflow(object):
 
             version = self.version
 
-        if isinstance(version, basestring):
+        if isinstance(version, str):
             from update import Version
             version = Version(version)
 
@@ -2453,7 +2447,7 @@ class Workflow(object):
             h = groups.get('hex')
             password = groups.get('pw')
             if h:
-                password = unicode(binascii.unhexlify(h), 'utf-8')
+                password = binascii.unhexlify(h)
 
         self.logger.debug('got password : %s:%s', service, account)
 
@@ -2485,6 +2479,7 @@ class Workflow(object):
 
     def _register_default_magic(self):
         """Register the built-in magic arguments."""
+
         # TODO: refactor & simplify
         # Wrap callback and message with callable
         def callback(func, msg):
@@ -2653,7 +2648,7 @@ class Workflow(object):
     def open_terminal(self):
         """Open a Terminal window at workflow's :attr:`workflowdir`."""
         subprocess.call(['open', '-a', 'Terminal',
-                        self.workflowdir])
+                         self.workflowdir])
 
     def open_help(self):
         """Open :attr:`help_url` in default browser."""
@@ -2695,8 +2690,8 @@ class Workflow(object):
         """
         encoding = encoding or self._input_encoding
         normalization = normalization or self._normalizsation
-        if not isinstance(text, unicode):
-            text = unicode(text, encoding)
+        if not isinstance(text, str):
+            text = str(text)
         return unicodedata.normalize(normalization, text)
 
     def fold_to_ascii(self, text):
@@ -2715,8 +2710,7 @@ class Workflow(object):
         if isascii(text):
             return text
         text = ''.join([ASCII_REPLACEMENTS.get(c, c) for c in text])
-        return unicode(unicodedata.normalize('NFKD',
-                       text).encode('ascii', 'ignore'))
+        return unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
 
     def dumbify_punctuation(self, text):
         """Convert non-ASCII punctuation to closest ASCII equivalent.
@@ -2763,7 +2757,8 @@ class Workflow(object):
     def _load_info_plist(self):
         """Load workflow info from ``info.plist``."""
         # info.plist should be in the directory above this one
-        self._info = plistlib.readPlist(self.workflowfile('info.plist'))
+        with open(self.workflowfile('info.plist'), mode='rb') as f:
+            self._info = plistlib.load(f)
         self._info_loaded = True
 
     def _create(self, dirpath):

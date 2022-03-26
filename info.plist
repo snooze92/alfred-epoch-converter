@@ -3,9 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>snooze92.epoch.converter</string>
-	<key>category</key>
-	<string>Tools</string>
+	<string>giovanni-epochConverter</string>
 	<key>connections</key>
 	<dict>
 		<key>84A7FB97-8BB7-459D-BC8D-81F919E0B448</key>
@@ -39,7 +37,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Epoch Converter</string>
+	<string>Epoch Converter1.1</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -49,6 +47,8 @@
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -56,7 +56,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>keyword</key>
-				<string>ts</string>
+				<string>epoch</string>
 				<key>queuedelaycustom</key>
 				<integer>3</integer>
 				<key>queuedelayimmediatelyinitially</key>
@@ -68,9 +68,10 @@
 				<key>runningsubtext</key>
 				<string>Converting timestamp...</string>
 				<key>script</key>
-				<string>/usr/bin/python epoch.py "{query}"</string>
+				<string>export PATH=/opt/homebrew/bin:/usr/local/bin:$PATH
+python3 epoch.py "$1"</string>
 				<key>scriptargtype</key>
-				<integer>0</integer>
+				<integer>1</integer>
 				<key>scriptfile</key>
 				<string></string>
 				<key>subtext</key>
@@ -78,7 +79,7 @@
 				<key>title</key>
 				<string>Convert epoch timestamp</string>
 				<key>type</key>
-				<integer>0</integer>
+				<integer>5</integer>
 				<key>withspace</key>
 				<true/>
 			</dict>
@@ -87,7 +88,7 @@
 			<key>uid</key>
 			<string>84A7FB97-8BB7-459D-BC8D-81F919E0B448</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -96,6 +97,8 @@
 				<false/>
 				<key>clipboardtext</key>
 				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
 				<key>transient</key>
 				<false/>
 			</dict>
@@ -104,7 +107,7 @@
 			<key>uid</key>
 			<string>14ADF12A-3111-4EBB-BA77-E196F0FCC87D</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -129,7 +132,7 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string></string>
+	<string>- March 2022 Updated to Python 3 (giovanni)</string>
 	<key>uidata</key>
 	<dict>
 		<key>14ADF12A-3111-4EBB-BA77-E196F0FCC87D</key>
@@ -154,7 +157,11 @@
 			<integer>140</integer>
 		</dict>
 	</dict>
+	<key>variablesdontexport</key>
+	<array/>
+	<key>version</key>
+	<string>1.1</string>
 	<key>webaddress</key>
-	<string>https://github.com/snooze92</string>
+	<string>https://github.com/snooze92/alfred-epoch-converter</string>
 </dict>
 </plist>

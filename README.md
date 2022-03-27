@@ -1,5 +1,13 @@
 ![icon](https://raw.githubusercontent.com/snooze92/alfred-epoch-converter/master/icon.png)
 
+## March 2022, updated to Python3
+<a href="https://github.com/giovannicoppola/alfred-epoch-converter/releases/latest/">
+  
+  <img alt="Downloads"
+       src="https://img.shields.io/github/downloads/giovannicoppola/alfred-epoch-converter/total?color=purple&label=Downloads"><br/>
+</a>
+
+
 Alfred epoch converter
 ======================
 

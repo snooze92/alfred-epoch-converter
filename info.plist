@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>giovanni-epochConverter</string>
+	<string>snooze92.epochConverter</string>
 	<key>connections</key>
 	<dict>
 		<key>84A7FB97-8BB7-459D-BC8D-81F919E0B448</key>
@@ -37,7 +37,7 @@
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
-	<string>Epoch Converter1.1</string>
+	<string>Epoch Converter</string>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -160,7 +160,7 @@ python3 epoch.py "$1"</string>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.1</string>
+	<string>1.1.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/snooze92/alfred-epoch-converter</string>
 </dict>

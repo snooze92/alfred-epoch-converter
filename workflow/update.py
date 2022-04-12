@@ -28,8 +28,8 @@ import tempfile
 import re
 import subprocess
 
-import workflow
-import web
+from . import workflow
+from . import web
 
 # __all__ = []
 

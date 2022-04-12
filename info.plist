@@ -49,6 +49,8 @@
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -68,7 +70,7 @@
 				<key>runningsubtext</key>
 				<string>Converting timestamp...</string>
 				<key>script</key>
-				<string>/usr/bin/python epoch.py "{query}"</string>
+				<string>/usr/bin/python3 epoch.py "{query}"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -87,7 +89,7 @@
 			<key>uid</key>
 			<string>84A7FB97-8BB7-459D-BC8D-81F919E0B448</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -96,6 +98,8 @@
 				<false/>
 				<key>clipboardtext</key>
 				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
 				<key>transient</key>
 				<false/>
 			</dict>
@@ -104,7 +108,7 @@
 			<key>uid</key>
 			<string>14ADF12A-3111-4EBB-BA77-E196F0FCC87D</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>

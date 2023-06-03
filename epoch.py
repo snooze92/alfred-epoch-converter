@@ -43,8 +43,9 @@ def add_epoch_to_time_conversion(workflow, timestamp, descriptor, converter):
         workflow.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
 
 
-def add_time_to_epoch_conversion(workflow, dt, descriptor, converter, multiplier):
-    converted = str(int((dt - converter(0)).total_seconds() * multiplier))
+def add_time_to_epoch_conversion(workflow, dt, descriptor, converter, multiplier, tzinfo=None):
+    epoch_dt = converter(0, tzinfo) if tzinfo is not None else converter(0)
+    converted = str(int((dt.replace(tzinfo=tzinfo) - epoch_dt).total_seconds() * multiplier))
     description = descriptor + ' epoch for ' + str(dt)
     workflow.add_item(title=converted, subtitle=description, arg=converted, valid=True, icon=ICON_CLOCK)
 
@@ -71,13 +72,13 @@ def attempt_conversions(workflow, input, prefix=''):
             )
 
             add_time_to_epoch_conversion(workflow, dt, '{prefix}Local s.'.format(**locals()),
-                                         datetime.datetime.fromtimestamp, 1)
+                                         datetime.datetime.fromtimestamp,1, dt.astimezone().tzinfo)
             add_time_to_epoch_conversion(workflow, dt, '{prefix}Local ms.'.format(**locals()),
-                                         datetime.datetime.fromtimestamp, 1e3)
+                                         datetime.datetime.fromtimestamp,1e3, dt.astimezone().tzinfo)
             add_time_to_epoch_conversion(workflow, dt, u'{prefix}Local µs.'.format(**locals()),
-                                         datetime.datetime.fromtimestamp, 1e6)
+                                         datetime.datetime.fromtimestamp,1e6, dt.astimezone().tzinfo)
             add_time_to_epoch_conversion(workflow, dt, '{prefix}Local ns.'.format(**locals()),
-                                         datetime.datetime.fromtimestamp, 1e9)
+                                         datetime.datetime.fromtimestamp,1e9, dt.astimezone().tzinfo)
 
             add_time_to_epoch_conversion(workflow, dt, '{prefix}UTC s.'.format(**locals()),
                                          datetime.datetime.utcfromtimestamp, 1)
@@ -87,8 +88,8 @@ def attempt_conversions(workflow, input, prefix=''):
                                          datetime.datetime.utcfromtimestamp, 1e6)
             add_time_to_epoch_conversion(workflow, dt, '{prefix}UTC ns.'.format(**locals()),
                                          datetime.datetime.utcfromtimestamp, 1e9)
-    except:
-        LOGGER.debug('Unable to read [{input}] as a human-readable datetime'.format(**locals()))
+    except Exception as e:
+        LOGGER.debug('Unable to read [{input}] as a human-readable datetime'.format(**locals()), e)
 
 
 def add_current(workflow, unit, multiplier):
